@@ -30,7 +30,7 @@ class FakeSession(BaseSession):
         self.calls.append(method)
         chat = Chat(id=42, type="private")
         if isinstance(method, GetMe):
-            return User(id=1, is_bot=True, first_name="CoinPlay", username="coinplay_test_bot")
+            return User(id=1, is_bot=True, first_name="Double Drop", username="doubledrop_test_bot")
         if isinstance(method, (SendMessage, EditMessageText)):
             return Message(message_id=len(self.calls), date=datetime.now(), chat=chat, text=method.text)
         if isinstance(method, AnswerCallbackQuery):
@@ -45,8 +45,7 @@ def user():
 class SmokeTests(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
         self.tmp = tempfile.TemporaryDirectory()
-        self.cfg = Config("123456:TEST", os.path.join(self.tmp.name, "t.db"),
-                          "https://example.com/offer", "https://t.me/thecoinplay", 17)
+        self.cfg = Config("123456:TEST", os.path.join(self.tmp.name, "t.db"), 17)
         self.db = DB(self.cfg.db_path)
         await self.db.connect()
         self.session = FakeSession()

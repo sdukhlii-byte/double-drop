@@ -32,16 +32,14 @@ python bot.py
 
 ## Деплой на Railway
 1. Новый сервис из этого репо, процесс `worker` (есть `Procfile`).
-2. Переменные: `BOT_TOKEN`, `COINPLAY_LINK`, `COMMUNITY_LINK`, `REMINDER_HOUR_UTC`.
+2. Переменные: `BOT_TOKEN`, `DB_PATH`, `REMINDER_HOUR_UTC`.
 3. Чтобы прогресс квеста и drops не стирались при редеплое — Volume в `/data` и `DB_PATH=/data/doubledrop.db`.
 
 ## Переменные окружения
 | Переменная | Что делает |
 |---|---|
 | `BOT_TOKEN` | токен из @BotFather (обязательно) |
-| `DB_PATH` | путь к SQLite, по умолчанию `coinplay.db` |
-| `COINPLAY_LINK` | кнопка «CoinPlay» в меню (скрыта, если пусто) |
-| `COMMUNITY_LINK` | кнопка «Community» (скрыта, если пусто) |
+| `DB_PATH` | путь к SQLite, по умолчанию `doubledrop.db` |
 | `REMINDER_HOUR_UTC` | час (UTC), когда уходит напоминание, по умолчанию 17 |
 
 ## Настройка в BotFather

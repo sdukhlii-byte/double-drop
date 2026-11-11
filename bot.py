@@ -59,10 +59,6 @@ def main_menu(cfg: Config, remind_on: bool | None = None) -> InlineKeyboardMarku
                 callback_data="menu:remind",
             )
         )
-    if cfg.coinplay_link:
-        kb.row(InlineKeyboardButton(text="🪙 CoinPlay", url=cfg.coinplay_link))
-    if cfg.community_link:
-        kb.row(InlineKeyboardButton(text="👥 Community", url=cfg.community_link))
     return kb.as_markup()
 
 
@@ -94,8 +90,6 @@ def after_round_keyboard(cfg: Config) -> InlineKeyboardMarkup:
         InlineKeyboardButton(text="🏆 Top", callback_data="menu:top"),
     )
     kb.row(InlineKeyboardButton(text="💧 My drops", callback_data="menu:me"))
-    if cfg.coinplay_link:
-        kb.row(InlineKeyboardButton(text="🪙 CoinPlay", url=cfg.coinplay_link))
     return kb.as_markup()
 
 
