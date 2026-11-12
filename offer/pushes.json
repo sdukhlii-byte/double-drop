@@ -1,0 +1,12 @@
+[
+  { "id": "reg1", "stage": "reg", "delayMinutes": 20,   "image": "push1.jpg",   "text": "push1.html", "buttons": ["play", "community"] },
+  { "id": "reg2", "stage": "reg", "delayMinutes": 90,   "image": "push2.jpg",   "text": "push2.html", "buttons": ["play", "community"] },
+  { "id": "reg3", "stage": "reg", "delayMinutes": 360,  "image": "welcome.png", "text": "push3.html", "buttons": ["play", "community"] },
+  { "id": "reg4", "stage": "reg", "delayMinutes": 1440, "image": "push1.jpg",   "text": "push4.html", "buttons": ["play", "community"] },
+  { "id": "reg5", "stage": "reg", "delayMinutes": 2880, "image": "push2.jpg",   "text": "push5.html", "buttons": ["play", "community"] },
+
+  { "id": "dep1", "stage": "dep", "delayMinutes": 15,   "image": "push2.jpg",   "text": "dep1.html",  "buttons": ["play", "community"] },
+  { "id": "dep2", "stage": "dep", "delayMinutes": 180,  "image": "push1.jpg",   "text": "dep2.html",  "buttons": ["play", "community"] },
+  { "id": "dep3", "stage": "dep", "delayMinutes": 1440, "image": "welcome.png", "text": "dep3.html",  "buttons": ["play", "community"] },
+  { "id": "dep4", "stage": "dep", "delayMinutes": 4320, "image": "push2.jpg",   "text": "dep4.html",  "buttons": ["play", "community"] }
+]

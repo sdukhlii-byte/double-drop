@@ -1,79 +1,69 @@
-# Double Drop — Telegram-бот (детектив-квест + мини-игра «дождь»)
+# coinplay-welcome-bot
 
-Основной режим: сложный детективный квест **The Double Drop** (Port Meridian, 1947).
-Мини-игра: **Raindrop Catch** — ловишь капли 💧 в сетке облаков, копишь drops, есть топ и ежедневное напоминание.
-Язык игры: английский.
+Telegram-бот с приветствием в формате референса (TonPlay): на `/start` приходит картинка (или видео) с подписью, внутри подписи — цитата с бонусами, под сообщением три кнопки:
 
-## Дело 1: The Double Drop
-Магнат Виктор Халлоран найден мёртвым в запертом кабинете отеля во время гала-вечера. Восемь подозреваемых, у каждого мотив и ложь.
-- 10 говорящих персонажей, 7 локаций, 31 улика
-- осмотр мест, допросы, **предъявление улик** (реакции персонажей), блокнот улик, подсказки (стоят 2 действия)
-- улики открывают новые локации и новые темы разговора; есть ложные следы
-- финальное обвинение: кто → как → почему; ошибка стоит 5 действий, дело остаётся открытым
-- рейтинг по числу потраченных действий (★★★ / ★★☆ / ★☆☆), прогресс сохраняется, на открытое дело приходит напоминание
-- за раскрытие: +30 drops (один раз, повторное прохождение награды не даёт)
+| Кнопка | Что делает | Цвет |
+|---|---|---|
+| **Play** | открывает оффер как мини-приложение внутри Telegram (через `/r`) | синяя |
+| **Play on the web** | открывает оффер в браузере (через `/r`) | красная |
+| **Join community!** | ссылка на ваше сообщество | серая |
 
-Спойлер-карта сюжета и тайм-лайн лежат в шапке `cases/double_drop.py`.
+Обе кнопки Play идут через собственный редирект `/r`: бот логирует клик и добавляет к ссылке Coinplay `click_id=<telegram_id>`, поэтому постбэки (reg, ftd) можно привязать к конкретному пользователю.
 
-## Как добавить новое дело
-Дело — это данные. Создай `cases/<имя>.py` по образцу `double_drop.py` (классы из `quest.py`: `Clue`, `Spot`, `Location`, `Topic`, `Reaction`, `Character`, `Case`), добавь его в `cases/__init__.py`.
-Тесты (`tests/test_quest.py`) сами проверят, что все ссылки на улики существуют, что каждую улику можно получить, что тексты влезают в сообщение Telegram и не ломают HTML-разметку.
+Стек: Node 20+, telegraf, express, SQLite (better-sqlite3). Long polling, **одна реплика**.
 
-## Команды
-`/start` · `/case` (дело) · `/notebook` · `/rain` (мини-игра) · `/top` · `/me` · `/reminder`
+## Запуск на Railway
 
-## Запуск локально
-```bash
-pip install -r requirements.txt
-cp .env.example .env   # вписать BOT_TOKEN
-export $(grep -v '^#' .env | xargs)
-python bot.py
+1. Загрузите репозиторий в GitHub и создайте сервис в Railway из него (или `railway up`).
+2. **Settings → Networking → Generate Domain** (нужен HTTPS-домен для кнопки Play).
+3. **Volumes → Add Volume**, mount path `/data` (там лежит SQLite; без volume база пропадёт при редеплое).
+4. **Variables** (см. `.env.example`): минимум `BOT_TOKEN` и `COINPLAY_LINK`.
+5. Текст оффера лежит в `offer/welcome.html`, обложка — `assets/welcome.png`. Видео — по желанию (`assets/welcome.mp4`, `WELCOME_VIDEO` или отправить боту с аккаунта из `ADMIN_IDS`).
+6. Деплой. Health-check — `/health`.
+
+## Что править
+
+- `offer/welcome.html` — текст поста (HTML Telegram: `<b>`, `<i>`, `<blockquote>`). Лимит подписи к картинке/видео — 1024 символа; если длиннее, текст уйдёт отдельным сообщением.
+- Обложка: `assets/welcome.png` или видео (см. `assets/README.md`).
+- Кнопки: тексты и цвета меняются через `BTN_*`, ряд соцсетей — `SOCIALS=off`.
+
+## Постбэки Coinplay
+
+В партнёрке для каждого события укажите URL:
+
+```
+https://<ваш-домен>/postback/coinplay?click_id={click_id}&event=reg&secret=<POSTBACK_SECRET>
+https://<ваш-домен>/postback/coinplay?click_id={click_id}&event=ftd&secret=<POSTBACK_SECRET>
 ```
 
-## Деплой на Railway
-1. Новый сервис из этого репо, процесс `worker` (есть `Procfile`).
-2. Переменные: `BOT_TOKEN`, `DB_PATH`, `REMINDER_HOUR_UTC`.
-3. Чтобы прогресс квеста и drops не стирались при редеплое — Volume в `/data` и `DB_PATH=/data/doubledrop.db`.
+`{click_id}` — макрос партнёрки (проверьте, как он называется у Coinplay). События пишутся в базу и видны в `/stats`.
 
-## Переменные окружения
-| Переменная | Что делает |
-|---|---|
-| `BOT_TOKEN` | токен из @BotFather (обязательно) |
-| `DB_PATH` | путь к SQLite, по умолчанию `doubledrop.db` |
-| `REMINDER_HOUR_UTC` | час (UTC), когда уходит напоминание, по умолчанию 17 |
+## Команды админа (`ADMIN_IDS`)
 
-## Настройка в BotFather
-**About** (`/setabouttext`, до 120 символов):
-```
-Port Meridian, 1947. A dead magnate, eight suspects, one night. Solve The Double Drop, then catch some rain.
-```
-**Description** (`/setdescription`):
-```
-Port Meridian, 1947. Shipping magnate Victor Halloran is dead in a locked room and eight people had a reason.
-
-Search the scenes, question the suspects, put the evidence on the table and name the killer.
-
-Need air? Step into the rain: a 30-second tap game with a fresh shower of bonus drops every day.
-```
-**Commands** (`/setcommands`):
-```
-case - Open the case file
-notebook - Your clues
-rain - Raindrop Catch mini-game
-top - Top catchers
-me - My drops
-reminder - Daily reminder on/off
-```
+- `/stats` — пользователи, клики, события постбэков, топ start-параметров.
+- Отправить боту фото или видео — оно станет обложкой приветствия.
 
 ## Тесты
-```bash
-python -m unittest discover -s tests -t . -v
-```
-28 тестов: логика дождя, база, целостность и разрешимость дела (бот сам «проходит» всё дело), сквозной прогон квеста через фейковую сессию aiogram с наградой и рестартом.
 
-## Структура
-- `bot.py` — главное меню, дождь, напоминания, сборка диспетчера
-- `quest.py` — движок квестов (чистая логика)
-- `quest_ui.py` — Telegram-обвязка квеста, сохранение, награда
-- `cases/` — дела (данные): `double_drop.py`
-- `game.py` — логика Raindrop Catch · `db.py` — SQLite · `config.py` — переменные окружения
+```
+npm install
+npm test
+```
+
+## Пуши: в регистрацию, потом в депозит
+
+Картинка + текст + кнопки Play и Join community!, как у TonPlay. Всё лежит в `offer/pushes.json`, `offer/*.html`, `assets/`.
+
+**Ветка «регистрация»** (юзер ещё не зарегистрирован), время считается от первого `/start`:
+`reg1` +20 мин, `reg2` +90 мин, `reg3` +6 ч, `reg4` +24 ч, `reg5` +48 ч.
+
+**Ветка «депозит»** (пришёл постбэк `reg`, депозита нет), время считается от постбэка регистрации:
+`dep1` +15 мин, `dep2` +3 ч, `dep3` +24 ч, `dep4` +72 ч.
+
+Правила:
+- После постбэка `reg` юзер уходит из ветки регистрации в ветку депозита; после постбэка `ftd` пуши прекращаются совсем. Также стоп при блокировке бота.
+- **Обязательно настрой в партнёрке Coinplay постбэки `reg` и `ftd`** на `/postback/coinplay` (см. выше). Без `reg` регистрированные юзеры будут получать пуши про регистрацию, а ветка депозита не запустится.
+- Между любыми двумя пушами одному юзеру минимум 30 минут (`PUSH_MIN_GAP_MIN`), за один проход шедулера не больше одного пуша на юзера.
+- Просроченный пуш (простой дольше `PUSH_MAX_LATE_MIN`, по умолчанию 180 мин) пропускается.
+- Каждый пуш уходит один раз (запись в `pushes` создаётся до отправки).
+- `/pushtest` (админ) присылает все пуши сразу, `/stats` показывает статусы по каждому. `PUSHES=off` выключает.
