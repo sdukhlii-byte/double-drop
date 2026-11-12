@@ -8,10 +8,10 @@
     "test": "node --test test/smoke.test.js test/bot.test.js test/pushes.test.js"
   },
   "engines": {
-    "node": ">=20"
+    "node": "22.x"
   },
   "dependencies": {
-    "better-sqlite3": "^11.5.0",
+    "better-sqlite3": "^12.11.1",
     "express": "^4.21.0",
     "telegraf": "^4.16.3"
   }

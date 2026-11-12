@@ -1,0 +1,4 @@
+# Node version comes from package.json engines (22.x), where better-sqlite3 has prebuilt binaries.
+# python3/gcc/make are a fallback in case it ever has to compile.
+[phases.setup]
+nixPkgs = ["...", "python3", "gcc", "gnumake"]
